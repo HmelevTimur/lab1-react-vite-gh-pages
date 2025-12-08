@@ -12,6 +12,7 @@ export default function UserTable() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const fetchUsers = async () => {
     setLoading(true)
@@ -30,6 +31,13 @@ export default function UserTable() {
     }
   }
 
+  const filteredUsers = users.filter((user) => {
+    if (searchQuery.length < 3) {
+      return true
+    }
+    return user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  })
+
   return (
     <div className="user-table-container">
       <button onClick={fetchUsers} disabled={loading}>
@@ -39,33 +47,46 @@ export default function UserTable() {
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       {users.length > 0 && (
-        <table
-          border={1}
-          style={{ marginTop: '20px', borderCollapse: 'collapse', width: '100%' }}
-        >
-          <thead>
-            <tr>
-              <th>Имя</th>
-              <th>Email</th>
-              <th>Телефон</th>
-              <th>Сайт</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.phone}</td>
-                <td>
-                  <a href={`http://${user.website}`} target="_blank" rel="noopener noreferrer">
-                    {user.website}
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <>
+          <input
+            type="text"
+            placeholder="Поиск по email"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ marginTop: '20px', padding: '8px', width: '100%', maxWidth: '400px' }}
+          />
+          {filteredUsers.length === 0 ? (
+            <p style={{ marginTop: '20px' }}>Ничего не найдено</p>
+          ) : (
+            <table
+              border={1}
+              style={{ marginTop: '20px', borderCollapse: 'collapse', width: '100%' }}
+            >
+              <thead>
+                <tr>
+                  <th>Имя</th>
+                  <th>Email</th>
+                  <th>Телефон</th>
+                  <th>Сайт</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone}</td>
+                    <td>
+                      <a href={`http://${user.website}`} target="_blank" rel="noopener noreferrer">
+                        {user.website}
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
     </div>
   )
