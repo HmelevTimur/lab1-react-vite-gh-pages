@@ -12,7 +12,7 @@ test('renders counter with initial value 0', () => {
 test('increments counter when button is clicked', () => {
   render(<App />)
 
-  const button = screen.getByRole('button')
+  const button = screen.getByRole('button', { name: /count is 0/i })
 
   fireEvent.click(button)
   expect(button.textContent).toMatch(/count is 1/i)
